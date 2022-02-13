@@ -12,11 +12,11 @@ urlpatterns = [
     # path for about view
     path(route='contact_us', view=views.get_contact_page, name='contact_us'),
     # path for contact us view
-
+    path(route='registration/', view=views.registration_request, name='registration'),
     # path for registration
-
+    path(route='login/', view=views.login_request, name='login'),
     # path for login
-
+    path(route='logout/', view=views.logout_request, name='logout'),
     # path for logout
 
     path(route='', view=views.get_dealerships, name='index'),

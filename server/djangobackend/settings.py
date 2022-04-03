@@ -27,7 +27,7 @@ DEBUG = True
 
 APPEND_SLASH = True
 
-ALLOWED_HOSTS = ["localhost","parthvinaytipathi17.eu-gb.mybluemix.net"]
+ALLOWED_HOSTS = ["localhost", "parthvinaytipathi17.eu-gb.mybluemix.net"]
 
 
 # Application definition
@@ -125,3 +125,5 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_ROOT = os.path.join(STATIC_ROOT, 'media')
 MEDIA_URL = '/media/'
+
+DEFAULT_AUTO_FIELD='django.db.models.AutoField'

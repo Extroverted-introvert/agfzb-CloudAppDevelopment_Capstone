@@ -28,7 +28,7 @@ DEBUG = True
 APPEND_SLASH = True
 
 ALLOWED_HOSTS = ["localhost", "parthvinaytipathi17.eu-gb.mybluemix.net"]
-
+CSRF_TRUSTED_ORIGINS = ['https://parthtripath-8000.theiadocker-1-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai',"parthvinaytipathi17.eu-gb.mybluemix.net",'https://*.127.0.0.1']
 
 # Application definition
 

@@ -1,5 +1,8 @@
 import requests
 import json
+from ibm_watson import NaturalLanguageUnderstandingV1
+from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
+from ibm_watson.natural_language_understanding_v1 import Features, SentimentOptions, KeywordsOptions
 from .models import CarDealer, DealerReview
 from requests.auth import HTTPBasicAuth
 
@@ -24,7 +27,16 @@ def get_request(url, **kwargs):
 
 # Create a `post_request` to make HTTP POST requests
 # e.g., response = requests.post(url, params=kwargs, json=payload)
-
+def post_request(url, json_payload, **kwargs):
+    print("POST to {} ".format(url))
+    print(json_payload)
+    try:
+        response = requests.post(url, json_payload, headers={'Content-Type': 'application/json'})
+    except Exception as e:
+        print("Error", e)
+    print("Status Code ", {response.status_code})
+    data = json.loads(response.text)
+    return data
 
 # Create a get_dealers_from_cf method to get dealers from a cloud function
 # def get_dealers_from_cf(url, **kwargs):
@@ -82,16 +94,21 @@ def get_dealer_reviews_from_cf(url, **kwargs):
     if json_result:
         # Get the row list in JSON as dealers
         print(json_result)
-        dealers = json_result['body']['data']["docs"]
+        reviews = json_result['body']['data']["docs"]
         # For each dealer object
-        for dealer in dealers:
+        for review in reviews:
             # Get its content in `doc` object
-            dealer_doc = dealer
-            dealer_obj = DealerReview(dealership=dealer_doc["dealership"], name=dealer_doc["name"], purchase=dealer_doc["purchase"], review=dealer_doc["review"],
-                                   purchase_date=dealer_doc["purchase_date"], car_make=dealer_doc["car_make"], car_model=dealer_doc["car_model"],
-                                   car_year=dealer_doc["car_year"],
-                                   sentiment=dealer_doc["sentiment"], id=dealer_doc["id"])
-            results.append(dealer_obj)
+            if review["purchase"] == True:
+                review_obj = DealerReview(dealership=review["dealership"], name=review["name"], purchase=review["purchase"], review=review["review"],
+                                    purchase_date=review["purchase_date"], car_make=review["car_make"], car_model=review["car_model"],
+                                    car_year=review["car_year"],
+                                    sentiment=analyze_review_sentiments(review["review"]), id=review["id"])
+            else:
+                review_obj = DealerReview(dealership=review["dealership"], name=review["name"], purchase=review["purchase"], review=review["review"],
+                                    purchase_date="", car_make="", car_model="",
+                                    car_year="",
+                                    sentiment=analyze_review_sentiments(review["review"]), id=review["id"])
+            results.append(review_obj)
 
     return results
 
@@ -99,6 +116,25 @@ def get_dealer_reviews_from_cf(url, **kwargs):
 # def analyze_review_sentiments(text):
 # - Call get_request() with specified arguments
 # - Get the returned sentiment label such as Positive or Negative
+def analyze_review_sentiments(dealerreview, **kwargs):
+    url = "https://api.eu-gb.natural-language-understanding.watson.cloud.ibm.com/instances/cb2aefd9-d5a2-47a6-a264-f828a89c948d"
+    apikey = "sr-0-z-CoiQ1TxicjNzLsFwoCR6tEbzzuQxktT9BJBDW"
 
+    authenticator = IAMAuthenticator(apikey)
+    natural_language_understanding = NaturalLanguageUnderstandingV1(
+    version='2022-04-07',
+    authenticator=authenticator
+    )
 
-
+    natural_language_understanding.set_service_url(url)
+    try:
+        response = natural_language_understanding.analyze(
+            text=dealerreview,
+            features=Features(sentiment=SentimentOptions())).get_result()
+        sentiment = response["sentiment"]["document"]["label"]
+    except:  
+        sentiment = "Data too low for analysis"      
+    # - Get the returned sentiment label such as Positive or Negative
+    print(sentiment)
+    #print(json.dumps(response, indent=2))
+    return sentiment

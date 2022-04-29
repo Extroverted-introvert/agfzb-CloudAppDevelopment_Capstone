@@ -62,7 +62,7 @@ def get_dealers_from_cf(url, **kwargs):
 
     return results
 
-def get_dealers_from_cf_state(url, **kwargs):
+def get_dealers_from_cf_id(url, **kwargs):
     results = []
     # Call get_request with a URL parameter
     json_result = get_request(url)

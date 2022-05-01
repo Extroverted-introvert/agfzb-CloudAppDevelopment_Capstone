@@ -5,38 +5,38 @@ from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 from ibm_watson.natural_language_understanding_v1 import Features, SentimentOptions, KeywordsOptions
 from .models import CarDealer, DealerReview
 from requests.auth import HTTPBasicAuth
+import logging
 
+logger = logging.getLogger(__name__)
 
 # Create a `get_request` to make HTTP GET requests
 # e.g., response = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
 #                                     auth=HTTPBasicAuth('apikey', api_key))
 def get_request(url, **kwargs):
-    print(kwargs)
-    print("GET from {} ".format(url))
+    logger.info("GET from {} ".format(url))
     try:
         # Call get method of requests library with URL and parameters
         response = requests.get(url, headers={'Content-Type': 'application/json'},
                                     params=kwargs)
     except:
         # If any error occurs
-        print("Network exception occurred")
+        logger.error("Network exception occurred")
     status_code = response.status_code
-    print("With status {} ".format(status_code))
+    logger.info("With status {} ".format(status_code))
     json_data = json.loads(response.text)
     return json_data
 
 # Create a `post_request` to make HTTP POST requests
 # e.g., response = requests.post(url, params=kwargs, json=payload)
 def post_request(url, json_payload, **kwargs):
-    print("POST to {} ".format(url))
-    print(json_payload)
+    logger.info("POST to {} ".format(url))
     try:
         response = requests.post(url, json_payload, headers={'Content-Type': 'application/json'})
     except Exception as e:
-        print("Error", e)
-    print("Status Code ", {response.status_code})
+        logger.error("Error", e)
+    logger.info("Status Code ", {response.status_code})
     data = json.loads(response.text)
-    print('data', data)
+    logger.info('data', data)
     return data
 
 # Create a get_dealers_from_cf method to get dealers from a cloud function
@@ -90,11 +90,11 @@ def get_dealers_from_cf_id(url, **kwargs):
 def get_dealer_reviews_from_cf(url, **kwargs):
     results = []
     # Call get_request with a URL parameter
-    print(url)
+    logger.info(url)
     json_result = get_request(url)
     if json_result:
         # Get the row list in JSON as dealers
-        print(json_result)
+        logger.info(json_result)
         reviews = json_result['body']['data']["docs"]
         # For each dealer object
         for review in reviews:
@@ -136,6 +136,6 @@ def analyze_review_sentiments(dealerreview, **kwargs):
     except:  
         sentiment = "Data too low for analysis"      
     # - Get the returned sentiment label such as Positive or Negative
-    print(sentiment)
+    logger.info(sentiment)
     #print(json.dumps(response, indent=2))
     return sentiment

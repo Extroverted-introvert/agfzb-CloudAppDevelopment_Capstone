@@ -54,7 +54,7 @@ def login_request(request):
 # Create a `logout_request` view to handle sign out request
 def logout_request(request):
     # Get the user object based on session id in request
-    print("Log out the user `{}`".format(request.user.username))
+    logger.info("Log out the user `{}`".format(request.user.username))
     # Logout user in the request
     logout(request)
     # Redirect user back to course list view
@@ -112,19 +112,19 @@ def get_dealer_details(request, dealer_id):
         dealer_detail = get_dealers_from_cf_id(dealer_url)
         context["reviews"] = reviews
         context["detail"] = dealer_detail[0]
-        print('delear_reviews', [ele.name for ele in reviews])
+        logger.info('delear_reviews', [ele.name for ele in reviews])
         return render(request, 'djangoapp/dealer_details.html', context)
         
 # Create a `add_review` view to submit a review
 # def add_review(request, dealer_id):
 # ...
 def add_review(request, dealer_id):
-    #print(dealer_id)
+    #logger.info(dealer_id)
     context = {}
     urldealer = "https://c266971e.eu-gb.apigw.appdomain.cloud/api/dealership?dealerId={}".format(dealer_id)
-    print(urldealer)
+    logger.info(urldealer)
     detail = get_dealers_from_cf_id(urldealer)
-    print(detail[0])
+    logger.info(detail[0])
     context["detail"] = detail[0]
     context["cars"] = CarModel.objects.all()
     if request.method == 'GET':
@@ -133,7 +133,7 @@ def add_review(request, dealer_id):
     if request.method == 'POST':
         
         car = get_object_or_404(CarModel, pk=request.POST["car"])
-        print("car",car)
+        logger.info("car",car)
         final_json = {}
         review = {}
         review["id"] = random.randint(1111,9999)
@@ -141,7 +141,7 @@ def add_review(request, dealer_id):
         review["dealership"] = int(dealer_id)
         review["review"] = request.POST["content"]
         review["purchase"] = request.POST.get("purchasecheck", False)
-        print("check value", review["purchase"])
+        logger.info("check value", review["purchase"])
         if review["purchase"]:
             review["purchase"] = True
             review["car_make"] = car.carmake.name
@@ -159,7 +159,7 @@ def add_review(request, dealer_id):
         final_json['review'] = review
 
         json_payload = json.dumps(final_json)
-        print(json_payload)
+        # logger.info(json_payload)
         url = "https://c266971e.eu-gb.apigw.appdomain.cloud/api/add_review"
         post_request(url, json_payload)
 

@@ -9,6 +9,7 @@ from django.contrib import messages
 from datetime import datetime
 import logging
 import json
+import random
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -111,6 +112,7 @@ def get_dealer_details(request, dealer_id):
         dealer_detail = get_dealers_from_cf_id(dealer_url)
         context["reviews"] = reviews
         context["detail"] = dealer_detail[0]
+        print('delear_reviews', [ele.name for ele in reviews])
         return render(request, 'djangoapp/dealer_details.html', context)
         
 # Create a `add_review` view to submit a review
@@ -119,9 +121,11 @@ def get_dealer_details(request, dealer_id):
 def add_review(request, dealer_id):
     #print(dealer_id)
     context = {}
-    urldealer = "https://c266971e.eu-gb.apigw.appdomain.cloud/api/review?dealerId={}".format(dealer_id)
-    detail = get_dealer_reviews_from_cf(urldealer)
-    context["detail"] = detail
+    urldealer = "https://c266971e.eu-gb.apigw.appdomain.cloud/api/dealership?dealerId={}".format(dealer_id)
+    print(urldealer)
+    detail = get_dealers_from_cf_id(urldealer)
+    print(detail[0])
+    context["detail"] = detail[0]
     context["cars"] = CarModel.objects.all()
     if request.method == 'GET':
         return render(request, 'djangoapp/add_review.html', context)
@@ -129,21 +133,32 @@ def add_review(request, dealer_id):
     if request.method == 'POST':
         
         car = get_object_or_404(CarModel, pk=request.POST["car"])
+        print("car",car)
+        final_json = {}
         review = {}
+        review["id"] = random.randint(1111,9999)
         review["name"] = request.user.username
-        review["time"] = datetime.utcnow().isoformat()
         review["dealership"] = int(dealer_id)
         review["review"] = request.POST["content"]
         review["purchase"] = request.POST.get("purchasecheck", False)
         print("check value", review["purchase"])
         if review["purchase"]:
             review["purchase"] = True
-            review["car_make"] = car.make_model.make
+            review["car_make"] = car.carmake.name
             review["car_model"] = car.name
             review["car_year"] = car.year.strftime("%Y")
+            review["another"] = "field"
             review["purchase_date"] = request.POST["purchasedate"]
+        else:
+            review["purchase"] = False
+            review["car_make"] = ""
+            review["car_model"] = ""
+            review["car_year"] = ""
+            review["another"] = "field"
+            review["purchase_date"] = ""
+        final_json['review'] = review
 
-        json_payload = json.dumps(review)
+        json_payload = json.dumps(final_json)
         print(json_payload)
         url = "https://c266971e.eu-gb.apigw.appdomain.cloud/api/add_review"
         post_request(url, json_payload)

@@ -22,14 +22,14 @@
     <!--Add a nav bar here -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="container">
-        <a class="navbar-brand" href="/djangoapp">Best Cars</a>
+        <a class="navbar-brand" href="/djangoapp">Car Review Capstone Project</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-              <a class="nav-link" href="/djangoapp">Home<span class="sr-only">(current)</span></a>
+            <li class="nav-item">
+              <a class="nav-link" href="/djangoapp">Home</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{% url 'djangoapp:about' %}">About us</a>
@@ -67,7 +67,7 @@
     {% endblock %}
 
     <!-- Footer -->
-    <footer class="bg-light pt-1 fixed-bottom">
+    <footer class="bg-light pt-1 relative-bottom">
       <div class="container">
         <ul class="nav justify-content-center">
           <li class="nav-item">
@@ -82,7 +82,7 @@
         </ul>
 
       <!-- Copyright -->
-      <div class="footer-copyright text-center py-3">© 2021 Copyright:Best Cars Dealership</div>
+      <div class="footer-copyright text-center py-3">© 2022 Copyright:Best Cars Dealership <br/> Made with &#10084; by Parth Tripathi</div>
     </div>
   </footer>
     
